@@ -1,10 +1,10 @@
 {
-   "manifest_version": 2,
+   "manifest_version": 3,
    "content_scripts": [ {
       "js": [ "src/inject/mza.js" ],
       "matches": [ "https://www.mza.cz/actapublica/matrika/detail/*", "https://www.mza.cz/scitacioperaty/digisada/detail/*", "https://www.mza.cz/indikacniskici/skica/detail/*" ]
    } ],
-   "content_security_policy": "script-src 'self' https://use.typekit.net/xtv1isi.js https://ssl.google-analytics.com https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js; object-src 'self'",
+   
    "description": "Pomocnik pro praci se sluzbama pro genealogii",
    "homepage_url": "https://www.rezi.io",
    "icons": {
@@ -13,11 +13,14 @@
       "48": "icons/icon48.png"
    },
    "name": "Digitalni Genealogie",
-   "page_action": {
+   "action": {
       "default_icon": "icons/icon19.png",
       "default_popup": "src/page_action/page_action.html",
       "default_title": "page action"
    },
    "version": "0.2.0",
-   "web_accessible_resources": [ "src/inject/mza_script.js" ]
+   "web_accessible_resources": [{
+      "resources": ["src/inject/mza_script.js"],
+      "matches": ["https://www.mza.cz/*"]
+   }]
 }
