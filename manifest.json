@@ -2,7 +2,7 @@
    "manifest_version": 2,
    "content_scripts": [ {
       "js": [ "src/inject/mza.js" ],
-      "matches": [ "https://www.mza.cz/actapublica/matrika/detail/*", "https://www.mza.cz/scitacioperaty/digisada/detail/*" ]
+      "matches": [ "https://www.mza.cz/actapublica/matrika/detail/*", "https://www.mza.cz/scitacioperaty/digisada/detail/*", "https://www.mza.cz/indikacniskici/skica/detail/*" ]
    } ],
    "content_security_policy": "script-src 'self' https://use.typekit.net/xtv1isi.js https://ssl.google-analytics.com https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js; object-src 'self'",
    "description": "Pomocnik pro praci se sluzbama pro genealogii",
@@ -18,6 +18,6 @@
       "default_popup": "src/page_action/page_action.html",
       "default_title": "page action"
    },
-   "version": "0.1.0",
+   "version": "0.2.0",
    "web_accessible_resources": [ "src/inject/mza_script.js" ]
 }
