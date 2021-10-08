@@ -22,6 +22,8 @@
 
     getMeta() {
       return {
+        version: 1,
+        type: 'generic',
         url: window.location.href,
         comments: (this.comments || ""),
       }
@@ -37,10 +39,22 @@
       this.death = death;
     }
     prompt(page) {
-      this.type = prompt(t("prompt_type"), "");
-      if (this.type === null) {
-        return false;
+      if (this.birth && !this.marriage && !this.death) {
+        this.type = "N";
       }
+      if (!this.birth && this.marriage && !this.death) {
+        this.type = "O";
+      }
+      if (!this.birth && !this.marriage && this.death) {
+        this.type = "Z";
+      }
+      if (this.type === null) {
+        this.type = prompt(t("prompt_type"), "");
+        if (this.type === null) {
+          return false;
+        }
+      }
+
       this.year = prompt(t("prompt_year"), "");
       if (this.year === null) {
         return false;
@@ -73,8 +87,10 @@
 
     getMeta() {
       return {
+        version: 1,
+        type: 'record',
         url: window.location.href,
-        matrika: {
+        record: {
           book: this.book,
           page: this.page,
           originPlace: this.orig_place,
@@ -122,8 +138,10 @@
 
     getMeta() {
       return {
+        version: 1,
+        type: 'scitaci',
         url: window.location.href,
-        operat: {
+        scitaci: {
           archive: this.archive,
           page: this.page,
           place: this.place,
@@ -131,6 +149,41 @@
           houseNo: this.houseNo,
         },
         person: this.person ? [this.person] : [],
+        comments: (this.comments || null)
+      };
+    }
+  }
+
+  class IndikacniSkica {
+    constructor(place, state, year) {
+      this.place = place;
+      this.state = state;
+      this.year = year;
+    }
+    prompt() {
+      this.comments = prompt(t("prompt_comments"));
+      if (this.comments === null) {
+        return false;
+      }
+
+      this.isValid = true;
+      return true;
+    }
+
+    getFilename() {
+      return `Indikacni skica - ${this.year} ${this.place} - ${this.state}`;
+    }
+
+    getMeta() {
+      return {
+        version: 1,
+        type: 'map',
+        url: window.location.href,
+        map: {
+          year: this.year,
+          place: this.place,
+          state: this.state,
+        },
         comments: (this.comments || null)
       };
     }
@@ -249,7 +302,7 @@
     
     function mzaDownload() {
       var page = $("#input-page").val();
-      var level = mzaViewer.source.maxLevel - 1,
+      var level = mzaViewer.source.maxLevel,
         scale = mzaViewer.source.getLevelScale(level),
         width = Math.ceil(mzaViewer.source.width * scale),
         height = Math.ceil(mzaViewer.source.height * scale),
@@ -258,18 +311,23 @@
         rows = mzaViewer.source.getNumTiles(level).y,
         cols = mzaViewer.source.getNumTiles(level).x;
 
+      // Maps are to big, we need to zoom out a bit
+      if (window.location.pathname.startsWith("/indikacniskici/skica/detail/")) {
+        level = level - 1;
+      }
+
       if (width > 16000 || height > 16000) {
-        alert('Image is to big, your browser supports this');
+        alert('Image is to big, your browser does not supports download of that sise');
         return;
       }
 
       var recordPrompt;
       if (window.location.pathname.startsWith("/actapublica/matrika/detail/")) {
-        var orig_place = $('main[role="main"] .card:eq(0) .row:eq(0) .col-12:eq(1) strong').text().trim();
-        var book = $('main[role="main"] .card:eq(0) .row:eq(0) .col-12:eq(0) strong').text().trim();
-        var birth = $('main[role="main"] .card:eq(0) .row:eq(0) .col-12:eq(2) strong').text().trim();
-        var marriage = $('main[role="main"] .card:eq(0) .row:eq(0) .col-12:eq(3) strong').text().trim();
-        var death = $('main[role="main"] .card:eq(0) .row:eq(0) .col-12:eq(4) strong').text().trim();
+        var orig_place = $('main[role="main"] ul:eq(0) li:eq(2) span.font-weight-bolder').text().trim();
+        var book = $('main[role="main"] ul:eq(0) li:eq(1) span.font-weight-bolder').text().trim();
+        var birth = $('main[role="main"] ul:eq(1) li:eq(0) span.d-inline-block').text().trim();
+        var marriage = $('main[role="main"] ul:eq(1) li:eq(1) span.d-inline-block').text().trim();
+        var death = $('main[role="main"] ul:eq(1) li:eq(2) span.d-inline-block').text().trim();
         recordPrompt = new Matrika(book, page, orig_place, birth, marriage, death);
       } else if (window.location.pathname.startsWith("/scitacioperaty/digisada/detail/")) {
         var place = $('main[role="main"] .card:eq(0) .row:eq(0) .col-12:eq(0) strong').text().trim();
@@ -277,6 +335,11 @@
         var year = $('main[role="main"] .card:eq(0) .row:eq(1) .col-12:eq(2) strong').text().trim();
         var address = $('main[role="main"] .card:eq(0) .row:eq(2) .col-12:eq(0) strong').text().trim();
         recordPrompt = new Scitaci(place, archive, year, address);
+      } else if (window.location.pathname.startsWith("/indikacniskici/skica/detail/")) {
+        var place = $('.card-header > ul.nav li:eq(3) span.font-weight-bolder').text().trim();
+        var state = $('.card-header > ul.nav li:eq(5) span.font-weight-bolder').text().trim();
+        var year = $('.card-header > ul.nav li:eq(6) span.font-weight-bolder').text().trim();
+        recordPrompt = new IndikacniSkica(place, state, year);
       } else {
         recordPrompt = new GenericRecord();
       }

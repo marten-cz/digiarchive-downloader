@@ -6,7 +6,7 @@
    } ],
    
    "description": "Pomocnik pro praci se sluzbama pro genealogii",
-   "homepage_url": "https://www.rezi.io",
+   "homepage_url": "https://github.com/marten-cz/digiarchive-downloader",
    "icons": {
       "128": "icons/icon128.png",
       "16": "icons/icon16.png",
@@ -18,7 +18,7 @@
       "default_popup": "src/page_action/page_action.html",
       "default_title": "page action"
    },
-   "version": "0.2.1",
+   "version": "0.3.0",
    "web_accessible_resources": [{
       "resources": ["src/inject/mza_script.js"],
       "matches": ["https://www.mza.cz/*"]
